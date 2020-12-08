@@ -15,7 +15,7 @@ class UsersService {
         })
     }
 
-    saveData = () => {
+    rewrite = () => {
         fs.writeFile(filePath, JSON.stringify(this.usersList), (err) => {
             if (err) return err
         })
@@ -32,7 +32,7 @@ class UsersService {
     addUser = (user) => {
         user.id = uuid.v4();
         this.usersList.push(user);
-        this.saveData();
+        this.rewrite();
         return this.usersList;
     }
 
@@ -42,13 +42,13 @@ class UsersService {
                 user.name = body.name;
             }
         })
-        this.saveData();
+        this.rewrite();
         return this.usersList;
     }
 
     deleteUser = (id) => {
         this.usersList = this.usersList.filter( (user) => user.id !== id )
-        this.saveData();
+        this.rewrite();
         return this.usersList;
     }
 }
