@@ -9,15 +9,19 @@ class UsersService {
         this.usersList = []
 
         fs.readFile(filePath, 'utf-8', (err, content) => {
-            if (err) return err
+            if (err) {
+                throw err
+            }
 
             this.usersList = JSON.parse(content);
         })
     }
 
-    saveData = () => {
+    rewrite = () => {
         fs.writeFile(filePath, JSON.stringify(this.usersList), (err) => {
-            if (err) return err
+            if (err) {
+                return err
+            }
         })
     }
 
@@ -32,23 +36,23 @@ class UsersService {
     addUser = (user) => {
         user.id = uuid.v4();
         this.usersList.push(user);
-        this.saveData();
+        this.rewrite();
         return this.usersList;
     }
 
     rewriteUsers = (body, id) => {
         this.usersList.forEach(user => {
             if(user.id === id) {
-                user.name = body.name;
+                user = body;
             }
         })
-        this.saveData();
+        this.rewrite();
         return this.usersList;
     }
 
     deleteUser = (id) => {
         this.usersList = this.usersList.filter( (user) => user.id !== id )
-        this.saveData();
+        this.rewrite();
         return this.usersList;
     }
 }

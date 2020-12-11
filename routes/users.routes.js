@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 
-const logPath = require("../middlewares/log-path.middleware");
+// const logPath = require("../middlewares/log-path.middleware");
 const controller = require("../controllers/users.controller");
 
 router
