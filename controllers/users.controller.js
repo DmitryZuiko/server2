@@ -22,10 +22,21 @@ class UsersController {
             .send(req.login);
     }
 
+    update = async(req, res, next) => {
+        res.send(
+            this.service.update({
+                ...JSON.parse(req.body.data),
+                avatar: req.file.path
+            }, req.params.id)
+        );
+    }
     add = async(req, res, next) => {
         res
             .status(201)
-            .send(await this.service.addUser(req.body));
+            .send(await this.service.addUser({
+                ...JSON.parse(req.body.data),
+                avatar: req.file.path
+            }));
     }
 
     rewrite = async(req, res, next) => {

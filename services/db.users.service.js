@@ -1,5 +1,6 @@
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
+const fs = require('fs');
 const { Sequelize, DataTypes, Model } = require('sequelize');
 const sequelize = new Sequelize({
     dialect: 'sqlite',
@@ -19,6 +20,9 @@ User.init({
         unique: true
     },
     password: {
+        type: DataTypes.STRING
+    },
+    avatar: {
         type: DataTypes.STRING
     }
 }, {
@@ -66,13 +70,27 @@ class DBUsersService {
         return await User.findOne({where: {id: id}})
     }
 
+    update = async(dataToUpdate, id) => {
+        // const oldAvatar = await User.findOne({where: {id: id}}).avatar;
+        // fs.unlink(oldAvatar, (err) => {
+        //     if (err) throw err;
+        // });
+        const data = {
+            ...await User.findOne({where: {id: id}}),
+            ...dataToUpdate
+        }
+        return await User.update(data,{where: {id: id}});
+    }
+
     addUser = async(user) => {
         const pass = user.password;
         const login = user.login;
+        const avatar = user.avatar;
         await bcrypt.hash(pass, 10, (err, hash) => {
             User.create({
                  login: login,
-                 password: hash
+                 password: hash,
+                 avatar: avatar
            })
         });
     }
