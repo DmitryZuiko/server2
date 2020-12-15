@@ -16,6 +16,12 @@ class UsersController {
             .send(await this.service.getUserById(req.params.id));
     }
 
+    getMe = (req, res, next) => {
+        res
+            .status(200)
+            .send(req.login);
+    }
+
     add = async(req, res, next) => {
         res
             .status(201)
@@ -32,6 +38,10 @@ class UsersController {
         res
             .status(201)
             .send(await this.service.deleteUser(req.params.id));
+    }
+
+    login = async(req, res) => {
+        res.send(await this.service.login(req.body.login, req.body.password));
     }
 }
 

@@ -1,3 +1,5 @@
+const jwt = require('jsonwebtoken');
+const bcrypt = require('bcrypt');
 const { Sequelize, DataTypes, Model } = require('sequelize');
 const sequelize = new Sequelize({
     dialect: 'sqlite',
@@ -12,7 +14,11 @@ User.init({
         defaultValue: Sequelize.UUIDV4,
         primaryKey: true
     },
-    name: {
+    login: {
+        type: DataTypes.STRING,
+        unique: true
+    },
+    password: {
         type: DataTypes.STRING
     }
 }, {
@@ -27,6 +33,29 @@ class DBUsersService {
         })()
     }
 
+    login = async(login, password) => {
+
+        const user = await User.findOne({where: {login: login}});
+        console.log(user.login);
+
+        const check = await bcrypt.compare(password, user.password);
+
+        if (check) {
+            return jwt.sign({login}, 'secret');
+            // const access = jwt.sign({login, type: 'access'}, 'secret', {expiresIn: 5 * 30});
+            // const refresh = jwt.sign({login, type: 'refresh'}, 'secret', {expiresIn: '24h'});
+            // return {
+            //     access,
+            //     refresh
+        }
+    }
+
+    // refresh = (login) => {
+    //     return {
+    //         token: jwt.sign( {login, type: 'access'}, 'secret', {expiresIn: 5 * 30})
+    //     }
+    // }
+
      getUsers = async() => {
          return await User.findAll({
              raw: true
@@ -38,7 +67,14 @@ class DBUsersService {
     }
 
     addUser = async(user) => {
-        await User.create(user);
+        const pass = user.password;
+        const login = user.login;
+        await bcrypt.hash(pass, 10, (err, hash) => {
+            User.create({
+                 login: login,
+                 password: hash
+           })
+        });
     }
 
     rewriteUsers = async(body, id) => {
